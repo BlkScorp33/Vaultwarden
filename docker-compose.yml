@@ -1,0 +1,32 @@
+version: '3'
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    env_file:
+      - .env
+    networks:
+      - traefik_scorpion
+    volumes:
+      - data:/data
+#      - /home/docker/vault/var:var/lo
+#    deploy:
+#      replicas: 2
+    ports:
+      - 3014:3012
+      - 8018:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.rule=Host(`app.$MY_DOMAIN`)"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=myresolver"
+      - "traefik.http.routers.vaultwarden.middlewares=authentik@file"
+    restart: unless-stopped
+
+
+networks:
+  traefik_scorpion:
+    driver: overlay
+    external: true
+volumes:
+   data:
